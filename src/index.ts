@@ -31,6 +31,7 @@ function parseArgs<T = string>(
   const [type, ...messages] = args;
   // @ts-ignore
   if (type === 'log' || type === 'info' || type === 'warn' || type === 'error')
+    // @ts-ignore
     return { type, messages };
   else
     return {
