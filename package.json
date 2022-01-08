@@ -1,5 +1,6 @@
 {
   "name": "@codemantion/logger",
+  "description": "An simple logger for browser console",
   "author": {
     "email": "sahoosantanu92@gmail.com",
     "name": "Santanu Prasad Sahoo"
