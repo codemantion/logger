@@ -1,6 +1,7 @@
-declare type Type = 'log' | 'info' | 'warn' | 'error';
+export declare type Type = 'log' | 'info' | 'warn' | 'error';
 
-declare type LoggerConfig = {
+export declare type LoggerConfig = {
+  isEnable: boolean;
   name: string;
   styles: {
     label: {
@@ -17,6 +18,7 @@ declare type LoggerConfig = {
   isShowLabel: boolean;
   isShowTimestamp: boolean;
   isUseNative: boolean;
+  isPrintOnConsole: boolean;
 };
 
 type ObjectType = { [key: string]: any };
@@ -51,7 +53,7 @@ function getMessages(...args: (string | string[])[]): string[] {
   if (_this.config.isShowTimestamp)
     timestampTemplate = timestampTemplate.replace(
       '%timestamp%',
-      String(new Date())
+      String(new Date().toISOString())
     );
   else timestampTemplate = timestampTemplate.replace('%timestamp%', '');
 
@@ -84,6 +86,7 @@ interface LoggerType {
 
 class Logger implements LoggerType {
   config: LoggerConfig = {
+    isEnable: true,
     name: 'logger',
     styles: {
       label: {
@@ -100,7 +103,9 @@ class Logger implements LoggerType {
     isShowLabel: true,
     isShowTimestamp: true,
     isUseNative: false,
+    isPrintOnConsole: true,
   };
+
   constructor(Config?: Partial<LoggerConfig>) {
     this.config = {
       ...this.config,
@@ -109,12 +114,16 @@ class Logger implements LoggerType {
   }
 
   log(...args: (string | string[])[]): void {
+    if (!this.config.isEnable) return;
     const [type, ...messages] = getMessages.call(this, ...args);
-    if (this.config.isUseNative) {
-      if (type === 'log' || type === 'info') console.log(...messages);
-      if (type === 'warn') console.warn(...messages);
-      if (type === 'error') console.error(...messages);
-    } else console.log(...messages);
+    console.log({ type, messages });
+    if (this.config.isPrintOnConsole) {
+      if (this.config.isUseNative) {
+        if (type === 'log' || type === 'info') console.log(...messages);
+        if (type === 'warn') console.warn(...messages);
+        if (type === 'error') console.error(...messages);
+      } else console.log(...messages);
+    }
   }
 
   info(...message: string[]): void {
@@ -145,6 +154,12 @@ class Logger implements LoggerType {
       ...config,
     };
   }
+
+  setEnable(isEnable: boolean): void {
+    this.config.isEnable = isEnable;
+  }
 }
 
-export default new Logger();
+const logger = new Logger();
+
+export default logger;
