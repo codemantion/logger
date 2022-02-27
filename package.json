@@ -24,22 +24,26 @@
     "node": ">=10"
   },
   "keywords": [
-    "logger", "log", "console"
+    "logger",
+    "log",
+    "console"
   ],
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
+    "lint": "eslint src/. --config .eslintrc --ext .ts",
+    "lint:fix": "eslint src/. --config .eslintrc --ext .ts --fix",
+    "prepare": "husky install",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "lint-staged": "lint-staged"
   },
   "peerDependencies": {},
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint:fix"
+    ]
   },
   "prettier": {
     "printWidth": 80,
@@ -60,7 +64,14 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^7.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
+    "prettier": "^2.5.1",
     "size-limit": "^7.0.5",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
