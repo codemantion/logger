@@ -1,16 +1,18 @@
 import { Type } from './index';
 
-class LoggerEventListener extends EventTarget {
+const eventTarget = new EventTarget();
+
+class LoggerEventListener {
 	on(type: Type | '*', listener: EventListener): void {
 		if (type !== '*' && type !== 'log' && type !== 'error' && type !== 'warn' && type !== 'info' && type !== 'dir')
 			throw new Error('Invalid event type');
-		this.addEventListener(type, listener);
+		eventTarget.addEventListener(type, listener);
 	}
 
 	off(type: Type | '*', listener: EventListener): void {
 		if (type !== '*' && type !== 'log' && type !== 'error' && type !== 'warn' && type !== 'info' && type !== 'dir')
 			throw new Error('Invalid event type');
-		this.removeEventListener(type, listener);
+		eventTarget.removeEventListener(type, listener);
 	}
 
 	dispatch(type: Type, messages: any[], originalMessages: any[]): void {
@@ -19,14 +21,14 @@ class LoggerEventListener extends EventTarget {
 			messages,
 			originalMessages,
 		};
-		this.dispatchEvent(
+		eventTarget.dispatchEvent(
 			new CustomEvent(type, {
 				detail,
 				bubbles: true,
 				cancelable: true,
 			}),
 		);
-		this.dispatchEvent(
+		eventTarget.dispatchEvent(
 			new CustomEvent('*', {
 				detail,
 				bubbles: true,

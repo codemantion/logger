@@ -42,7 +42,9 @@
   "peerDependencies": {},
   "lint-staged": {
     "*.ts": [
-      "yarn lint:fix"
+      "yarn lint:fix",
+      "yarn build",
+      "yarn test"
     ]
   },
   "prettier": {
