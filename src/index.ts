@@ -1,4 +1,6 @@
-export declare type Type = 'log' | 'info' | 'warn' | 'error';
+import LoggerEventListener from "./event-listener";
+
+export declare type Type = 'log' | 'info' | 'warn' | 'error' | 'dir';
 
 export declare type LoggerConfig = {
   isEnable: boolean;
@@ -9,6 +11,7 @@ export declare type LoggerConfig = {
       info: string;
       warn: string;
       error: string;
+      dir: string;
     };
   };
   templates: {
@@ -42,7 +45,7 @@ function parseArgs<T = string>(
     };
 }
 
-function getMessages(...args: (string | string[])[]): string[] {
+function getMessages(...args: (string | string[])[]): [Type, string[], string[]] {
   // @ts-ignore
   const _this = this as Logger;
 
@@ -63,13 +66,16 @@ function getMessages(...args: (string | string[])[]): string[] {
     template = template.replace('%type%', type);
     return [
       type,
-      `%c${template}`,
-      _this.config.styles.label[type],
-      timestampTemplate,
-      ...messages,
+      [
+        `%c${template}`,
+        _this.config.styles.label[type],
+        timestampTemplate,
+        ...messages,
+      ],
+      messages
     ];
   } else {
-    return [type, timestampTemplate, ...messages];
+    return [type, [timestampTemplate, ...messages], messages];
   }
 }
 
@@ -84,7 +90,7 @@ interface LoggerType {
   dir(type: Type, ...data: ObjectType[]): void;
 }
 
-class Logger implements LoggerType {
+export class Logger extends LoggerEventListener implements LoggerType {
   config: LoggerConfig = {
     isEnable: true,
     name: 'logger',
@@ -94,6 +100,7 @@ class Logger implements LoggerType {
         info: 'background: #222; color: #bada55',
         warn: 'background: #ffdd76; color: #222',
         error: 'background: #ffc0c0; color: #ff0000',
+        dir: 'background: #222; color: #bada55',
       },
     },
     templates: {
@@ -107,6 +114,7 @@ class Logger implements LoggerType {
   };
 
   constructor(Config?: Partial<LoggerConfig>) {
+    super();
     this.config = {
       ...this.config,
       ...Config,
@@ -115,8 +123,7 @@ class Logger implements LoggerType {
 
   log(...args: (string | string[])[]): void {
     if (!this.config.isEnable) return;
-    const [type, ...messages] = getMessages.call(this, ...args);
-    console.log({ type, messages });
+    const [type, messages, originalMessage] = getMessages.call(this, ...args);
     if (this.config.isPrintOnConsole) {
       if (this.config.isUseNative) {
         if (type === 'log' || type === 'info') console.log(...messages);
@@ -124,6 +131,7 @@ class Logger implements LoggerType {
         if (type === 'error') console.error(...messages);
       } else console.log(...messages);
     }
+    this.dispatch(type, messages, originalMessage);
   }
 
   info(...message: string[]): void {
