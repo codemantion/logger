@@ -1,6 +1,12 @@
 <div id="top"></div>
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/@codemantion/logger">
+    <img alt="Version npm" src="https://img.shields.io/npm/v/@codemantion/logger.svg" />
+  </a>
+  <a href="https://npmcharts.com/compare/@codemantion/logger?minimal=true">
+    <img alt="Tests Passing" src="https://img.shields.io/npm/dm/@codemantion/logger.svg" />
+  </a>
   <a href="https://github.com/codemantion/logger/actions">
     <img alt="Tests Passing" src="https://github.com/codemantion/logger/workflows/Tests/badge.svg" />
   </a>
@@ -49,6 +55,7 @@
     <li><a href="#installation">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#config-options">Config Options</a></li>
+    <li><a href="#events">Events</a></li>
 <!--     <li>
       <a href="#usage">Usage</a>
       <ul>
@@ -168,3 +175,43 @@ logger.setConfig({
 | `isShowTimestamp`  | `boolean`     | `true`       | Print log without timestamp      |
 | `isUseNative`      | `boolean`     | `false`      | Use native console on print logs |
 | `isPrintOnConsole` | `boolean`     | `true`       | Print logs on console or not     |
+
+## Events
+
+### add event listener
+```js
+logger.on("log", (message) => {
+  console.log(message);
+});
+```
+
+### add and remove event listener
+```js
+const onLog = (message) => {
+  console.log(message);
+};
+logger.on("log", onLog);
+// ...
+// ...
+logger.off("log", onLog);
+```
+
+### for all events
+```js
+const onLog = (message) => {
+  console.log(message);
+};
+logger.on("*", onLog);
+// ...
+// ...
+logger.off("*", onLog);
+```
+
+### access log details
+```js
+const onLog = (message) => {
+  console.log(message);
+  const { type, messages, originalMessages } = message.detail;
+};
+logger.on("*", onLog);
+```

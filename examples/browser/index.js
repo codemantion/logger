@@ -1,6 +1,12 @@
 import logger from "../../dist";
 
-logger.setConfig({ isUseNative: true });
+// logger.setConfig({ isUseNative: true });
+
+const onLog = (log) => {
+  console.log(log);
+};
+
+logger.on("*", onLog);
 
 logger.log("log", "log message");
 logger.info("info message");
@@ -13,3 +19,5 @@ logger.dir({
         key2: "value2",
     }
 });
+
+logger.off('*', onLog);
