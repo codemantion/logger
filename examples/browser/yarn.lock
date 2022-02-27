@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@codemantion/logger@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@codemantion/logger/-/logger-0.1.2.tgz#ea34c5853ad72c695a8a513f7030e55fca690514"
+  integrity sha512-/x5hBl+ZnyufsQ5PtPUww8j5YQIe1b50DfBGXTX2UUE8gdiQUAtQColvVjfd1hq3lQ7FPoQLxXduyqpm1opQtA==
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz#d5e0706cf8c6acd8c6032f8d54070af261bbbb2f"
