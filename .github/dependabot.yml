@@ -15,4 +15,4 @@ updates:
       - "yarn"
       - "dependencies"
     pull-request-branch-name:
-      separator: ":"
+      separator: "/"
