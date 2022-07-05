@@ -1,4 +1,4 @@
-import logger from '../src';
+import logger from '../dist';
 
 describe('blah', () => {
 	it('works', () => {
