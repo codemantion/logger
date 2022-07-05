@@ -46,8 +46,7 @@
   "lint-staged": {
     "*.ts": [
       "yarn lint:fix",
-      "yarn build",
-      "yarn test"
+      "yarn build"
     ]
   },
   "prettier": {
