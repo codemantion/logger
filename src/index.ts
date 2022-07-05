@@ -1,30 +1,6 @@
 import LoggerEventListener from './event-listener';
-
-export declare type Type = 'log' | 'info' | 'warn' | 'error' | 'dir';
-
-export declare type LoggerConfig = {
-	isEnable: boolean;
-	name: string;
-	styles: {
-		label: {
-			log: string;
-			info: string;
-			warn: string;
-			error: string;
-			dir: string;
-		};
-	};
-	templates: {
-		log: string;
-		timestamp: string;
-	};
-	isShowLabel: boolean;
-	isShowTimestamp: boolean;
-	isUseNative: boolean;
-	isPrintOnConsole: boolean;
-};
-
-type ObjectType = { [key: string]: any };
+import { LoggerConfig, LoggerType, Type } from './types';
+import Log from './Log';
 
 function parseArgs<T = string>(args: T[], defaultType: Type = 'log'): { type: Type; messages: T[] } {
 	if (args.length === 1) {
@@ -44,38 +20,29 @@ function parseArgs<T = string>(args: T[], defaultType: Type = 'log'): { type: Ty
 		};
 }
 
-function getMessages(...args: (string | string[])[]): [Type, string[], string[]] {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	const _this = this as Logger;
-
+function getMessages(args: (string | string[])[], config: LoggerConfig): Log {
 	const { type, messages } = parseArgs<string>(args as string[]);
 
-	let timestampTemplate = _this.config.templates.timestamp;
+	let timestampTemplate = config.templates.timestamp;
 
-	if (_this.config.isShowTimestamp)
-		timestampTemplate = timestampTemplate.replace('%timestamp%', String(new Date().toISOString()));
+	const timestamp = String(new Date().toISOString());
+
+	if (config.isShowTimestamp) timestampTemplate = timestampTemplate.replace('%timestamp%', timestamp);
 	else timestampTemplate = timestampTemplate.replace('%timestamp%', '');
 
-	if (_this.config.isShowLabel) {
-		let template = _this.config.templates.log;
-		template = template.replace('%name%', _this.config.name);
+	if (config.isShowLabel) {
+		let template = config.templates.log;
+		template = template.replace('%name%', config.name);
 		template = template.replace('%type%', type);
-		return [type, [`%c${template}`, _this.config.styles.label[type], timestampTemplate, ...messages], messages];
+		return new Log(
+			type,
+			[`%c${template}`, config.styles.label[type], timestampTemplate, ...messages],
+			messages,
+			timestamp,
+		);
 	} else {
-		return [type, [timestampTemplate, ...messages], messages];
+		return new Log(type, [timestampTemplate, ...messages], messages, timestamp);
 	}
-}
-
-interface LoggerType {
-	config: LoggerConfig;
-	log(...message: string[]): void;
-	log(type: Type, ...message: string[]): void;
-	info(...message: string[]): void;
-	warn(...message: string[]): void;
-	error(...message: string[]): void;
-	dir(...data: ObjectType[]): void;
-	dir(type: Type, ...data: ObjectType[]): void;
 }
 
 export class Logger extends LoggerEventListener implements LoggerType {
@@ -109,40 +76,46 @@ export class Logger extends LoggerEventListener implements LoggerType {
 		};
 	}
 
-	log(...args: (string | string[])[]): void {
+	private print(log: Log) {
 		if (!this.config.isEnable) return;
-		const [type, messages, originalMessage] = getMessages.call(this, ...args);
+		// const [type, messages, originalMessage] = getMessages.call(this, ...args);
 		if (this.config.isPrintOnConsole) {
 			if (this.config.isUseNative) {
 				// eslint-disable-next-line no-console
-				if (type === 'log' || type === 'info') console.log(...messages);
+				if (log.type === 'log' || log.type === 'info') console.log(...log.messages);
 				// eslint-disable-next-line no-console
-				if (type === 'warn') console.warn(...messages);
+				if (log.type === 'warn') console.warn(...log.messages);
 				// eslint-disable-next-line no-console
-				if (type === 'error') console.error(...messages);
+				if (log.type === 'error') console.error(...log.messages);
 				// eslint-disable-next-line no-console
-			} else console.log(...messages);
+			} else console.log(...log.messages);
 		}
-		this.dispatch(type, messages, originalMessage);
 	}
 
-	info(...message: string[]): void {
-		this.log('info', ...message);
+	log(...args: (string | string[])[]): Log {
+		const log = getMessages(args, this.config);
+		this.print(log);
+		this.dispatch(log);
+		return log;
 	}
 
-	warn(...message: string[]): void {
-		this.log('warn', ...message);
+	info(...message: string[]): Log {
+		return this.log('info', ...message);
 	}
 
-	error(...message: string[]): void {
-		this.log('error', ...message);
+	warn(...message: string[]): Log {
+		return this.log('warn', ...message);
 	}
 
-	dir(...args: (string | { [key: string]: any })[]): void {
+	error(...message: string[]): Log {
+		return this.log('error', ...message);
+	}
+
+	dir(...args: (string | { [key: string]: any })[]): Log {
 		const { type, messages } = parseArgs<string | { [key: string]: any }>(args, 'info');
 
 		const result = messages.map((each) => JSON.stringify(each, null, 2));
-		this.log(type, ...result);
+		return this.log(type, ...result);
 	}
 
 	setConfig(config: Partial<LoggerConfig>): void {
@@ -154,6 +127,30 @@ export class Logger extends LoggerEventListener implements LoggerType {
 
 	setEnable(isEnable: boolean): void {
 		this.config.isEnable = isEnable;
+	}
+
+	label(name: string): Logger {
+		if (!name) return this;
+		return this.clone({ name: this.config.name + ':' + name });
+	}
+
+	with(data: any): Logger {
+		const newLogger = this.clone();
+		newLogger.print = (log) => {
+			log.with = data;
+			this.print(log);
+		};
+		return newLogger;
+	}
+
+	new(config?: Partial<LoggerConfig>): Logger {
+		return new Logger({ ...this.config, ...config });
+	}
+
+	clone(config?: Partial<LoggerConfig>): Logger {
+		const newLogger = new Logger({ ...this.config, ...config });
+		newLogger.eventTarget = this.eventTarget;
+		return newLogger;
 	}
 }
 
