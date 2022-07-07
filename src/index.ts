@@ -1,6 +1,8 @@
 import LoggerEventListener from './event-listener';
 import { LoggerConfig, LoggerType, Type } from './types';
-import Log from './Log';
+import Log from './log';
+import LoggerUser from './user';
+export * from './log';
 
 function parseArgs<T = string>(args: T[], defaultType: Type = 'log'): { type: Type; messages: T[] } {
 	if (args.length === 1) {
@@ -67,6 +69,7 @@ export class Logger extends LoggerEventListener implements LoggerType {
 		isUseNative: false,
 		isPrintOnConsole: true,
 	};
+	user: LoggerUser;
 
 	constructor(Config?: Partial<LoggerConfig>) {
 		super();
@@ -74,6 +77,7 @@ export class Logger extends LoggerEventListener implements LoggerType {
 			...this.config,
 			...Config,
 		};
+		this.user = new LoggerUser();
 	}
 
 	private print(log: Log) {
@@ -150,6 +154,7 @@ export class Logger extends LoggerEventListener implements LoggerType {
 	clone(config?: Partial<LoggerConfig>): Logger {
 		const newLogger = new Logger({ ...this.config, ...config });
 		newLogger.eventTarget = this.eventTarget;
+		newLogger.user = this.user;
 		return newLogger;
 	}
 }

@@ -1,5 +1,5 @@
 import { Type } from './types';
-import Log from './Log';
+import Log from './log';
 
 class LoggerEventListener {
 	eventTarget = new EventTarget();
