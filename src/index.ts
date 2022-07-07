@@ -96,26 +96,26 @@ export class Logger extends LoggerEventListener implements LoggerType {
 		}
 	}
 
-	log(...args: (string | string[])[]): Log {
+	log(...args: (any | any[])[]): Log {
 		const log = getMessages(args, this.config);
 		this.print(log);
 		this.dispatch(log);
 		return log;
 	}
 
-	info(...message: string[]): Log {
+	info(...message: any[]): Log {
 		return this.log('info', ...message);
 	}
 
-	warn(...message: string[]): Log {
+	warn(...message: any[]): Log {
 		return this.log('warn', ...message);
 	}
 
-	error(...message: string[]): Log {
+	error(...message: any[]): Log {
 		return this.log('error', ...message);
 	}
 
-	dir(...args: (string | { [key: string]: any })[]): Log {
+	dir(...args: (string | { [key: string]: any } | any)[]): Log {
 		const { type, messages } = parseArgs<string | { [key: string]: any }>(args, 'info');
 
 		const result = messages.map((each) => JSON.stringify(each, null, 2));

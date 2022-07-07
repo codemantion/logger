@@ -6,11 +6,11 @@ export declare type ObjectType = { [key: string]: any };
 
 export declare interface LoggerType {
 	config: LoggerConfig;
-	log(...message: string[]): void;
+	log(...message: any[]): void;
 	log(type: Type, ...message: string[]): void;
-	info(...message: string[]): void;
-	warn(...message: string[]): void;
-	error(...message: string[]): void;
+	info(...message: any[]): void;
+	warn(...message: any[]): void;
+	error(...message: any[]): void;
 	dir(...data: ObjectType[]): void;
 	dir(type: Type, ...data: ObjectType[]): void;
 }
