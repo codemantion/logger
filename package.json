@@ -11,7 +11,7 @@
     "directory": "."
   },
   "bugs": "https://github.com/codemantion/logger/issues",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
