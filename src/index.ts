@@ -135,7 +135,12 @@ export class Logger extends LoggerEventListener implements LoggerType {
 
 	label(name: string): Logger {
 		if (!name) return this;
-		return this.clone({ name: this.config.name + ':' + name });
+		const newLogger = this.clone({ name: this.config.name + ':' + name });
+		newLogger.print = (log) => {
+			log.label = name;
+			this.print(log);
+		};
+		return newLogger;
 	}
 
 	with(data: any): Logger {

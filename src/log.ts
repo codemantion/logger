@@ -4,8 +4,9 @@ export default class Log {
 	messages: any[] = [];
 	type: Type = 'log';
 	originalMessages: any[] = [];
-	with: any;
+	with: any | undefined;
 	timestamp: string;
+	label: string | undefined;
 
 	constructor(type: Type, messages: any[], originalMessages: any[], timestamp: string) {
 		this.type = type;
